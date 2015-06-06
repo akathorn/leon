@@ -30,6 +30,8 @@ class Synthesizer(val context : LeonContext,
   def getSearch: Search = {
     if (settings.manualSearch.isDefined) {
       new ManualSearch(context, ci, problem, settings.costModel, settings.manualSearch)
+    } else if (settings.advancedManualSearch.isDefined) {
+      new AdvancedManualSearch(context, ci, problem, settings.costModel, settings.advancedManualSearch)
     } else {
       new SimpleSearch(context, ci, problem, settings.costModel, settings.searchBound)
     }

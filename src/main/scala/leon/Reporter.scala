@@ -114,7 +114,7 @@ class DefaultReporter(debugSections: Set[DebugSection]) extends Reporter(debugSe
   }
 
   def smartPos(p: Position): String = {
-    if (p == NoPosition) {
+    if (p == NoPosition || p.file == null) {
       ""
     } else {
       val target = p.file.getAbsolutePath()

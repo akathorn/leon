@@ -303,6 +303,14 @@ class ManualSearch(ctx: LeonContext, ci: ChooseInfo, problem: Problem, costModel
 
               if (!currentNode.isExpanded) {
                 res = Some(Some(currentNode))
+              } else {
+                currentNode match {
+                  case an: AndNode if (an.ri.rule == rules.UserInput) =>
+                    println("You want me to ask again? Ok... You are the human")
+                    currentNode.isExpanded = false
+                    res = Some(Some(currentNode))
+                  case _ => ()
+                }
               }
           }
         } catch {

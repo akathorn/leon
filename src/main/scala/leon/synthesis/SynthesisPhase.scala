@@ -16,6 +16,7 @@ object SynthesisPhase extends LeonPhase[Program, Program] {
   val description = "Partial synthesis of \"choose\" constructs"
 
   val optManual      = LeonStringOptionDef("manual", "Manual search", default = "", "cmd")
+  val optAdvManual   = LeonStringOptionDef("advmanual", "Advanced manual search", default = "", "cmd")
   val optCostModel   = LeonStringOptionDef("costmodel", "Use a specific cost model for this search", "FIXME", "cm")
   val optDerivTrees  = LeonFlagOptionDef( "derivtrees", "Generate derivation trees", false)
 
@@ -25,19 +26,21 @@ object SynthesisPhase extends LeonPhase[Program, Program] {
   val optCEGISVanuatoo   = LeonFlagOptionDef( "cegis:vanuatoo",   "Generate inputs using new korat-style generator",       false)
 
   override val definedOptions : Set[LeonOptionDef[Any]] =
-    Set(optManual, optCostModel, optDerivTrees, optCEGISShrink, optCEGISOptTimeout, optCEGISVanuatoo)
+    Set(optManual, optAdvManual, optCostModel, optDerivTrees, optCEGISShrink, optCEGISOptTimeout, optCEGISVanuatoo)
 
   def processOptions(ctx: LeonContext): SynthesisSettings = {
     val ms = ctx.findOption(optManual)
+    val advms = ctx.findOption(optAdvManual)
     SynthesisSettings(
       manualSearch = ms,
+      advancedManualSearch = advms,
       functions = ctx.findOption(SharedOptions.optFunctions) map { _.toSet },
       timeoutMs = ctx.findOption(SharedOptions.optTimeout) map { _ * 1000 },
       generateDerivationTrees = ctx.findOptionOrDefault(optDerivTrees),
       cegisUseOptTimeout = ctx.findOption(optCEGISOptTimeout),
       cegisUseShrink = ctx.findOption(optCEGISShrink),
       cegisUseVanuatoo = ctx.findOption(optCEGISVanuatoo),
-      rules = Rules.all ++ (ms map { _ => rules.AsChoose}),
+      rules = Rules.all ++ (ms map { _ => rules.AsChoose}) ++ (advms map{ _ => rules.UserInput})  ++ (advms map{ _ => rules.AsChoose}),
       costModel = {
         ctx.findOption(optCostModel) match {
           case None => CostModels.default

@@ -6,7 +6,14 @@ package frontends.scalac
 import scala.tools.nsc.{Global,Settings=>NSCSettings}
 import scala.reflect.internal.Positions
 
+object ScalaCompilerReference {
+  var compiler: ScalaCompiler = null
+}
+
+
 class ScalaCompiler(settings : NSCSettings, ctx: LeonContext) extends Global(settings, new SimpleReporter(settings, ctx.reporter)) with Positions {
+
+  ScalaCompilerReference.compiler = this
 
   object leonExtraction extends {
     val global: ScalaCompiler.this.type = ScalaCompiler.this
@@ -21,7 +28,7 @@ class ScalaCompiler(settings : NSCSettings, ctx: LeonContext) extends Global(set
     val runsRightAfter = None
     val ctx = ScalaCompiler.this.ctx
   } with SaveImports
-  
+
   object addTypeAnnotations extends {
     val global: ScalaCompiler.this.type = ScalaCompiler.this
     val runsAfter = List[String]()
